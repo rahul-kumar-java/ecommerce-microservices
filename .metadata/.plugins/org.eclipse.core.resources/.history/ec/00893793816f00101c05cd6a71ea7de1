@@ -1,0 +1,30 @@
+package com.rahul.ecommerce.orderservice.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import com.rahul.ecommerce.orderservice.client.ProductServiceFeignClient;
+import com.rahul.ecommerce.orderservice.dto.ProductResponse;
+import com.rahul.ecommerce.orderservice.exception.ProductServiceUnavailableException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ProductServiceClientWrapper {
+
+	ProductServiceFeignClient productServiceFeignClient;
+	
+	@CircuitBreaker(name="productService", fallbackMethod="fallbackForGetProductByIdFeign")
+	ProductResponse getProductById(@PathVariable("id") Long id) {
+		
+	return	productServiceFeignClient.getProductById(id);
+	}
+	
+	public ProductResponse fallbackForGetProductByIdFeign(Long id, Exception t) {
+		
+		log.warn("Fallback method fallbackForGetProductByIdFeign is triggered. Reason {}", t.getMessage());
+		throw new ProductServiceUnavailableException("Product service is not available");
+	}
+}

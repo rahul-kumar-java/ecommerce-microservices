@@ -1,0 +1,16 @@
+package com.rahul.ecommerce.orderservice.exception;
+
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class GlobalExceptionHandler {
+
+	
+	public ResponseEntity<?> handleProductServiceNotAvailableException(Exception ex) {
+		
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error" , ex.getMessage()));
+	}
+}

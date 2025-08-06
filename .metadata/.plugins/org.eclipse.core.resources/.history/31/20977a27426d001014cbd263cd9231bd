@@ -1,0 +1,19 @@
+package com.rahul.ecommerce.orderservice.client.fallback;
+
+import java.math.BigDecimal;
+import com.rahul.ecommerce.orderservice.client.ProductServiceFeignClient;
+import com.rahul.ecommerce.orderservice.dto.ProductResponse;
+
+public class ProductServiceFallback implements ProductServiceFeignClient {
+
+	@Override
+	public ProductResponse getProductById(Long id) {
+
+	return ProductResponse.builder()
+		               .id(id)
+		               .name("Unavailable Product")
+		               .price(BigDecimal.ZERO)
+		               .stockQuantity(0)
+		               .build();
+	}
+}

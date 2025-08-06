@@ -1,0 +1,18 @@
+package com.rahul.ecommerce.orderservice.client;
+
+import com.rahul.ecommerce.orderservice.dto.ProductResponse;
+import com.rahul.ecommerce.orderservice.exception.ProductServiceUnavailableException;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class ProductServiceFallback implements ProductServiceFeignClient {
+
+	@Override
+	public ProductResponse getProductById(Long id) {
+
+		log.warn("fallback triggered for getProductById using feign client" );
+	//	log.warn("Fallback triggered for getProductById. Reason: {}", t.getMessage());
+		throw new ProductServiceUnavailableException("Product Service is unavailable (Feign Fallback)");
+	}
+
+}

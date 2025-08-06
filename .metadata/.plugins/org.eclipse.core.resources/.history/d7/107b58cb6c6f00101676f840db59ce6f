@@ -1,0 +1,14 @@
+package com.rahul.ecommerce.orderservice.client;
+
+import com.rahul.ecommerce.orderservice.dto.ProductResponse;
+import com.rahul.ecommerce.orderservice.exception.ProductServiceUnavailableException;
+
+public class ProductServiceFallback implements ProductServiceFeignClient {
+
+	@Override
+	public ProductResponse getProductById(Long id) {
+
+		throw new ProductServiceUnavailableException("Product not found");
+	}
+
+}

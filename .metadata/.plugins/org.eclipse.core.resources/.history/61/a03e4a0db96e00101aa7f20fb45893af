@@ -1,0 +1,22 @@
+package com.rahul.ecommerce.orderservice.client;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import com.rahul.ecommerce.orderservice.dto.ProductResponse;
+
+@Component
+public class ProductServiceRestClient {
+
+	@Autowired
+	RestTemplate restTemplate;
+	
+	public final String BASE_URL="http://localhost:9093/api/products";
+	
+	public ProductResponse getProductById(Long productId) {
+		
+	String url = BASE_URL+"/"+productId;
+		
+	return restTemplate.getForObject(url, ProductResponse.class);
+	}
+}

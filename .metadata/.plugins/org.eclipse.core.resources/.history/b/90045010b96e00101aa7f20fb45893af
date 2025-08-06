@@ -1,0 +1,40 @@
+package com.rahul.ecommerce.orderservice.client;
+
+import java.math.BigDecimal;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import com.rahul.ecommerce.orderservice.dto.OrderRequest;
+import com.rahul.ecommerce.orderservice.dto.ProductResponse;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
+@Component
+public class ProductServiceRestClient {
+
+	@Autowired
+	RestTemplate restTemplate;
+	
+	public final String BASE_URL="http://localhost:9093/api/products";
+	
+	
+	@CircuitBreaker(name="product_service", fallbackMethod="getProductByIdFallback")
+	public ProductResponse getProductById(Long productId) {
+		
+	String url = BASE_URL+"/"+productId;
+	return restTemplate.getForObject(url, ProductResponse.class);
+	
+	}
+	
+	public ProductResponse getProductByIdFallback(OrderRequest orderRequest) {
+		
+		ProductResponse.builder()
+		               .id(orderRequest.getProductId())
+		               .name("Product Service Unavailable")
+		               .price(BigDecimal.ZERO)
+		               .stockQuantity(0)
+		               .build();
+		}
+}

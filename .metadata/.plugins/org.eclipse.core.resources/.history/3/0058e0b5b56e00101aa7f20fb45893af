@@ -1,0 +1,83 @@
+package com.rahul.ecommerce.orderservice.service;
+
+import java.math.BigDecimal;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+import com.rahul.ecommerce.orderservice.client.ProductServiceFeignClient;
+import com.rahul.ecommerce.orderservice.client.ProductServiceRestClient;
+import com.rahul.ecommerce.orderservice.dto.OrderRequest;
+import com.rahul.ecommerce.orderservice.dto.OrderResponse;
+import com.rahul.ecommerce.orderservice.dto.ProductResponse;
+import com.rahul.ecommerce.orderservice.entity.Order;
+import com.rahul.ecommerce.orderservice.event.OrderPlacedEvent;
+import com.rahul.ecommerce.orderservice.repository.OrderRepository;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class OrderServiceImpl implements OrderService {
+
+	@Autowired
+	OrderRepository orderRepository;
+	
+	@Autowired
+	ProductServiceRestClient productServiceRestClient;
+	
+	//@Autowired
+	//KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
+	
+	@Override
+	@CircuitBreaker(name="productService", fallbackMethod = "getProductByIdFallback")
+	public OrderResponse createOrder(OrderRequest orderRequest) {
+
+		ProductResponse productResponse = productServiceRestClient.getProductById(orderRequest.getProductId());
+		
+		BigDecimal untiPrice = productResponse.getPrice();
+		BigDecimal totalPrice = untiPrice.multiply(BigDecimal.valueOf(orderRequest.getQuantity()));
+		
+		// convert dto to entity
+
+		Order order = Order.builder().userId(orderRequest.getUserId()).productId(orderRequest.getProductId())
+				.quantity(orderRequest.getQuantity()).totalPrice(totalPrice).build();
+
+		Order savedOrder = orderRepository.save(order);
+		// prepare for publish event
+		
+		OrderPlacedEvent event = OrderPlacedEvent.builder()
+				                                 .orderId(savedOrder.getId())
+				                                 .userId(savedOrder.getUserId())
+				                                 .productId(savedOrder.getProductId())
+				                                 .quantity(savedOrder.getQuantity())
+				                                 .totalPrice(savedOrder.getTotalPrice())
+				                                 .build();
+	//	kafkaTemplate.send("order-event", event);
+
+		// convert entity to dto
+
+		return OrderResponse.builder().id(savedOrder.getId()).userId(savedOrder.getUserId())
+				.productId(savedOrder.getProductId()).quantity(savedOrder.getQuantity())
+				.totalPrice(savedOrder.getTotalPrice()).createdAt(savedOrder.getCreatedAt()).build();
+	}
+	
+	public  OrderResponse getProductByIdFallback(OrderRequest orderRequest, Throwable t){
+		
+	return OrderResponse.builder()
+		               .id(orderRequest.getProductId())
+		               .quantity(0)
+		               .userId(null);
+		               .build();
+	}
+
+	@Override
+	public OrderResponse getOrderById(Long id) {
+		
+	Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found with ID: "+id));
+		
+   return	OrderResponse.builder().id(order.getId()).userId(order.getUserId())
+	        .productId(order.getProductId()).quantity(order.getQuantity())
+	       .totalPrice(order.getTotalPrice()).createdAt(order.getCreatedAt()).build();
+	}
+}
