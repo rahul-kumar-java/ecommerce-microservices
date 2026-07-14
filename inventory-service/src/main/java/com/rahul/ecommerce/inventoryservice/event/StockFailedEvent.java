@@ -1,0 +1,17 @@
+package com.rahul.ecommerce.inventoryservice.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class StockFailedEvent {
+
+	private Long orderId;
+    private Long productId;
+    private String reason;
+}
