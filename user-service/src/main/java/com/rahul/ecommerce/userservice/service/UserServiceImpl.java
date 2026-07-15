@@ -1,10 +1,12 @@
 package com.rahul.ecommerce.userservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.rahul.ecommerce.userservice.dto.UserRegistrationRequest;
 import com.rahul.ecommerce.userservice.dto.UserResponse;
 import com.rahul.ecommerce.userservice.entity.User;
+import com.rahul.ecommerce.userservice.exception.UserNotFoundException;
 import com.rahul.ecommerce.userservice.repository.UserRepository;
 
 @Service
@@ -13,13 +15,19 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	UserRepository userRepository;
 	
+	@Autowired
+	PasswordEncoder passwordEncoder;
+	
 	@Override
 	public UserResponse createUser(UserRegistrationRequest userRegistrationRequest) {
 		
-// DTO to Entity Mapping   
+// DTO to Entity Mapping
+		
+		
 	User user=User.builder()
 			.username(userRegistrationRequest.getName())
 			.email(userRegistrationRequest.getEmail())
+			.password(passwordEncoder.encode(userRegistrationRequest.getPassword()))
 			.build();
 		
 		User createdUser=userRepository.save(user);
@@ -37,7 +45,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserResponse getUserById(Long id) {
 		
-	User user =  userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found")
+	User user =  userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User Not Found with id: "+id)
 	);
 	return	UserResponse.builder()
             .id(user.getId())

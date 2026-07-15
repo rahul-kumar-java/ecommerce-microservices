@@ -12,11 +12,11 @@ public class UserServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(UserServiceApplication.class, args);
 		
-		BCryptPasswordEncoder encoder =
-				 new BCryptPasswordEncoder();
-		System.out.println(
-				 encoder.encode("rahul@123")
-				 );
+		//BCryptPasswordEncoder encoder =
+			//	 new BCryptPasswordEncoder();
+		//System.out.println(
+			//	 encoder.encode("rahul@123")
+		//		 );
 	}
 
 }
