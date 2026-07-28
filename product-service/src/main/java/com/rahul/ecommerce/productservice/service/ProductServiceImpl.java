@@ -20,7 +20,6 @@ public class ProductServiceImpl implements ProductService {
 	Product entity = Product.builder()
 		       .name(productRequest.getName())
 		       .price(productRequest.getPrice())
-		       .status(productRequest.getStatus())
 		       .build();
 		
 	Product createdProduct=productRepository.save(entity);   

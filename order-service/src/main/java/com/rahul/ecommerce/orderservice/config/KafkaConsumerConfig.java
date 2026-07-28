@@ -22,7 +22,7 @@ public class KafkaConsumerConfig {
 
 	        props.put(
 	                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-	                "localhost:9092"
+	                "172.17.154.85:9092"
 	        );
 
 	        props.put(
@@ -55,7 +55,7 @@ public class KafkaConsumerConfig {
 	    }
 	    
 	    @Bean
-	    public ConcurrentKafkaListenerContainerFactory
+	     ConcurrentKafkaListenerContainerFactory
 	    <String, StockReservedEvent>
 
 	    stockReservedKafkaListenerFactory() {
@@ -71,7 +71,7 @@ public class KafkaConsumerConfig {
 	    }
 	    
 	    @Bean
-	    public ConsumerFactory<String, StockFailedEvent>
+	     ConsumerFactory<String, StockFailedEvent>
 	    stockFailedConsumerFactory() {
 
 	        JsonDeserializer<StockFailedEvent> deserializer =

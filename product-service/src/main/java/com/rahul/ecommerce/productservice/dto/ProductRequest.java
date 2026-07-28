@@ -14,8 +14,4 @@ public class ProductRequest {
 	
 	private BigDecimal price;
 	
-	//private Integer stockQuantity;
-	
-	private String status;
-	
 }
