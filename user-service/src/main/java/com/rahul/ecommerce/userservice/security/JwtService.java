@@ -10,6 +10,8 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
+	private static final long ACCESS_TOKEN_EXPIRATION = 1000*60*15; // 15 minutes
+	
 	// Base64 encoded secret key (minimum 32 characters before encoding)
 	private static final String secret = "myverysecuresecretkeyforjwt123456";
 	// plain text: mysecretkeymysecretkeymysecretkey123
@@ -23,7 +25,7 @@ public class JwtService {
                 .subject(username)
                 .issuedAt(new Date())
                 .expiration(
-                        new Date(System.currentTimeMillis() + 1000 * 60 * 60)
+                        new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION)
                 )
                 .signWith(getSignKey())
                 .compact();
@@ -71,7 +73,6 @@ public class JwtService {
 
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
-	
 }
 
 

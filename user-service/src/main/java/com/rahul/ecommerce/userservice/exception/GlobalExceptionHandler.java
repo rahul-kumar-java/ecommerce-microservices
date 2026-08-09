@@ -25,4 +25,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
 		
 	}
+	
+	
+	@ExceptionHandler(InvalidRefreshTokenException.class)
+	public ResponseEntity<?> getInvalidRefreshTokenException(InvalidRefreshTokenException ex)
+	{
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+	}
 }

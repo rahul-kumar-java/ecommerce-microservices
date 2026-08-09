@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rahul.ecommerce.userservice.dto.AuthResponse;
-import com.rahul.ecommerce.userservice.dto.LoginRequest;
 import com.rahul.ecommerce.userservice.dto.UserRegistrationRequest;
 import com.rahul.ecommerce.userservice.dto.UserResponse;
 import com.rahul.ecommerce.userservice.service.AuthService;
@@ -40,15 +38,6 @@ public class UserController {
 	UserResponse response =	userService.getUserById(id);
 	return ResponseEntity.status(HttpStatus.FOUND).body(response);
 	}
-	/*
-	@PostMapping("/login")
-	public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-		
-		AuthResponse generatedToken=authService.login(loginRequest);
-		System.out.println("generated token:  "+generatedToken);
-		return ResponseEntity.ok(generatedToken);
-	}
-	*/
 }
 
 

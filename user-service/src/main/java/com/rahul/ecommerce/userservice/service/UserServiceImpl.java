@@ -54,6 +54,11 @@ public class UserServiceImpl implements UserService {
             .createdAt(user.getCreatedAt())
             .build();
 	}
+
+	@Override
+	public User getUserByid(Long userId) {
+		return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+	}
 }
 
 

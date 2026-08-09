@@ -1,5 +1,6 @@
 package com.rahul.ecommerce.apigateway.security;
 
+import org.apache.hc.core5.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -18,11 +19,19 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     @Override
     public  Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-    	 String path = exchange.getRequest()
+    	 String path=exchange.getRequest()
                  .getURI().getPath();
+    	 String method=exchange.getRequest()
+    	         .getMethod().name();    
+    	 
+    	 System.out.println("Path: "+path);
+    	 System.out.println("Method: "+method);
 
     	// Allow login endpoint without JWT
-         if (path.contains("/api/auth/login") || path.contains("/api/users")) {
+         if (path.contains("/api/auth/login") 
+        		 || (path.contains("/api/users") &&  method.equals("POST"))
+                 || path.contains("/api/auth/refresh-token"))
+         {
              return chain.filter(exchange);
          }
     	
