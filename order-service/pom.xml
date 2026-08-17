@@ -90,16 +90,23 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		
-		
-		<!--<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
-		</dependency>-->
-		<!--<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
-		</dependency>-->
-	</dependencies>
+		<!-- Micrometer Tracing + OpenTelemetry -->
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-tracing-bridge-otel</artifactId>
+</dependency>
+
+<!-- Export traces to Zipkin -->
+<dependency>
+    <groupId>io.opentelemetry</groupId>
+    <artifactId>opentelemetry-exporter-zipkin</artifactId>
+</dependency>
+<!-- Feign + Micrometer -->
+<!--<dependency>
+    <groupId>io.github.openfeign</groupId>
+    <artifactId>feign-micrometer</artifactId>
+</dependency>-->
+			</dependencies>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
