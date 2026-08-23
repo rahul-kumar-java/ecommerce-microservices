@@ -13,12 +13,10 @@ import lombok.Setter;
 @Builder
 public class OrderPlacedEvent {
 
+	private String eventId;
 	private Long orderId;
-//	private Long userId;
 	private Long productId;
 	private Integer quantity;
-//	private BigDecimal totalPrice;
-	//private LocalDateTime createdAt;
 	
 	
 	

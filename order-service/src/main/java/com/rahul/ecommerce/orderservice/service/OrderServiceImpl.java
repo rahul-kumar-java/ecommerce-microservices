@@ -1,71 +1,29 @@
 package com.rahul.ecommerce.orderservice.service;
 
 import java.math.BigDecimal;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.UUID;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
 import com.rahul.ecommerce.orderservice.client.ProductServiceFeignClient;
-import com.rahul.ecommerce.orderservice.client.ProductServiceRestClient;
 import com.rahul.ecommerce.orderservice.dto.OrderRequest;
 import com.rahul.ecommerce.orderservice.dto.OrderResponse;
 import com.rahul.ecommerce.orderservice.dto.OrderStatus;
 import com.rahul.ecommerce.orderservice.dto.ProductResponse;
 import com.rahul.ecommerce.orderservice.entity.Order;
 import com.rahul.ecommerce.orderservice.event.OrderPlacedEvent;
-import com.rahul.ecommerce.orderservice.exception.InsufficientStockException;
 import com.rahul.ecommerce.orderservice.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService {
 
-	@Autowired
-	OrderRepository orderRepository;
-	
-	@Autowired
-	ProductServiceFeignClient  ProductServiceFeignClient;
-	
-	 @Autowired
-	 KafkaTemplate<String, Object> kafkaTemplate;
-	/*
-	@Override
-	public OrderResponse createOrder(OrderRequest orderRequest) {
+	private final OrderRepository orderRepository;
+	private final ProductServiceFeignClient  ProductServiceFeignClient;
+	private final KafkaTemplate<String, Object> kafkaTemplate;
 
-		ProductResponse productResponse = productServiceRestClient.getProductById(orderRequest.getProductId());
-	
-		if(productResponse.getStockQuantity() < orderRequest.getQuantity()) {
-			throw new InsufficientStockException("Insufficient Stock for Product ID: "+productResponse.getId());
-		}
-		
-		log.info("Product fetched: {}", productResponse.getName()); // This should show "Product Service Unavailable" if fallback
-		BigDecimal untiPrice = productResponse.getPrice();
-		BigDecimal totalPrice = untiPrice.multiply(BigDecimal.valueOf(orderRequest.getQuantity()));
-		
-		// convert dto to entity
-		Order order = Order.builder().userId(orderRequest.getUserId()).productId(orderRequest.getProductId())
-				.quantity(orderRequest.getQuantity()).totalPrice(totalPrice).build();
-
-		Order savedOrder = orderRepository.save(order);
-		
-		// prepare for publish event
-		OrderPlacedEvent event = OrderPlacedEvent.builder()
-				                                 .orderId(savedOrder.getId())
-				                                 .userId(savedOrder.getUserId())
-				                                 .productId(savedOrder.getProductId())
-				                                 .quantity(savedOrder.getQuantity())
-				                                 .totalPrice(savedOrder.getTotalPrice())
-				                                 .build();
-	    kafkaTemplate.send("order-event", savedOrder.getId().toString()  ,event);  // savedOrder.getId().toString() is a message key
-
-		// convert entity to dto
-
-		return OrderResponse.builder().id(savedOrder.getId()).userId(savedOrder.getUserId())
-				.productId(savedOrder.getProductId()).quantity(savedOrder.getQuantity())
-				.totalPrice(savedOrder.getTotalPrice()).createdAt(savedOrder.getCreatedAt()).build();
-	}
-	*/
 	 
 	 
 	   @Override
@@ -93,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
 	  // prepare for publish OrderPlacedEvent
 		
 			OrderPlacedEvent event = OrderPlacedEvent.builder()
+					                                 .eventId(UUID.randomUUID().toString())
 					                                 .orderId(savedOrder.getId())
 					                                 .productId(savedOrder.getProductId())
 					                                 .quantity(savedOrder.getQuantity())
