@@ -1,6 +1,9 @@
 package com.rahul.ecommerce.inventoryservice.listener;
 
 import java.time.LocalDateTime;
+import org.springframework.kafka.annotation.DltHandler;
+import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -28,12 +31,14 @@ public class OrderInventoryListener {
 	private final InventoryRepository inventoryRepository;
 	private final ProcessedEventRepository processedEventRepository;
 
+	
+	@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 2000))
 	@Transactional
 	@KafkaListener(topics = "order-event", groupId = "inventory-group", containerFactory = "kafkaListenerContainerFactory")
 	public void handleOrderPlaced(OrderPlacedEvent event) {
 
-		log.info("Received OrderPlacedEvent: {}", event);
-
+		log.info("Received OrderPlacedEvent: {}", event.toString());
+         
 		// Idempotency check
 
 		if (processedEventRepository.existsByEventId(event.getEventId())) {
@@ -79,6 +84,7 @@ public class OrderInventoryListener {
 		processedEventRepository.save(processedEvent);
 
 		log.info("Stock reserved and event marked as processed. eventId:  {}", event.getEventId());
+		
 
 		// Publish success event
 
@@ -87,5 +93,22 @@ public class OrderInventoryListener {
 		kafkaTemplate.send("stock-reserved-topic", event.getOrderId().toString(), reservedEvent);
 
 		log.info("StockReservedEvent published for orderId: {}", event.getOrderId());
+
+	}
+	
+	@DltHandler
+	public void handleDlt(OrderPlacedEvent event) {
+
+	    log.error(
+	        "OrderPlacedEvent moved to DLT. eventId={}, orderId={}, productId={}, quantity={}",
+	        event.getEventId(),
+	        event.getOrderId(),
+	        event.getProductId(),
+	        event.getQuantity()
+	    );
 	}
 }
+
+
+
+
